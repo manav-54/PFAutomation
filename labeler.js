@@ -60,6 +60,21 @@ const server = http.createServer((req, res) => {
                         statsEl.innerText = \`Remaining: \${data.remaining}\`;
                     }
 
+                    inputEl.addEventListener('input', (e) => {
+                        let val = inputEl.value;
+                        let formatted = '';
+                        for (let i = 0; i < val.length; i++) {
+                            if (i < 2) {
+                                formatted += val[i].toUpperCase();
+                            } else if (i < 4) {
+                                formatted += val[i].toLowerCase();
+                            } else {
+                                formatted += val[i];
+                            }
+                        }
+                        inputEl.value = formatted;
+                    });
+
                     inputEl.addEventListener('keydown', async (e) => {
                         if (e.key === 'Enter') {
                             const label = inputEl.value.trim();
@@ -103,7 +118,9 @@ const server = http.createServer((req, res) => {
             }
         });
     } else if (req.method === 'GET' && req.url.startsWith('/image/')) {
-        const imageName = decodeURIComponent(req.url.split('/')[2]);
+        // Remove query parameters like ?t=12345
+        const basePath = req.url.split('?')[0];
+        const imageName = decodeURIComponent(basePath.split('/')[2]);
         const imagePath = path.join(imagesDir, imageName);
         fs.readFile(imagePath, (err, data) => {
             if (err) {
